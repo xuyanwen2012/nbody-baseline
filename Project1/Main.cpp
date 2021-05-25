@@ -18,7 +18,7 @@ struct body
 	alignas(16) double mass;
 };
 
-constexpr size_t num_particles = 1024;
+constexpr int num_particles = 1024;
 
 std::array<body, num_particles> bodies;
 
@@ -42,7 +42,7 @@ vec2 get_raw_gravity_at(const vec2 position)
 
 void sub_step()
 {
-	std::for_each(std::execution::par,
+	std::for_each(std::execution::par_unseq,
 		bodies.begin(),
 		bodies.end(),
 		[&](body& body)
@@ -51,7 +51,7 @@ void sub_step()
 			body.velocity += acceleration * delta_t;
 		});
 
-	std::for_each(std::execution::par,
+	std::for_each(std::execution::par_unseq,
 		bodies.begin(),
 		bodies.end(),
 		[&](body& body)
