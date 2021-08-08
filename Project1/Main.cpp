@@ -3,90 +3,60 @@
 #include <execution>
 #include <iostream>
 #include <random>
-#include <chrono>
 #include <complex>
 
-#include "Vec2.h"
+using vec2 = std::complex<double>;
 
-using namespace std::chrono;
-
-constexpr double delta_t = 0.00005;
+double my_rand()
+{
+	static thread_local std::mt19937 generator;
+	const std::uniform_real_distribution distribution(0.0, 1.0);
+	return distribution(generator);
+}
 
 struct body
 {
-	vec2 position;
-	vec2 velocity;
-	alignas(16) double mass;
+	body(const vec2 pos, const double mass) : pos(pos), mass(mass)
+	{
+	}
+
+	vec2 pos;
+	double mass;
 };
 
-constexpr int num_particles = 65536;
-
-std::array<body, num_particles> bodies;
-
-vec2 gravity_func(const vec2 distance)
+vec2 kernel_func(const vec2& i, const vec2& j)
 {
-	const double l2 = distance.norm_sqr() + 1e-3;
-	return distance * pow(l2, -3.0 / 2.0);
-}
-
-vec2 get_raw_gravity_at(const vec2 position)
-{
-	vec2 acc{};
-	std::for_each(bodies.begin(),
-		bodies.end(),
-		[&](const body& body)
-		{
-			acc += gravity_func(body.position - position) * body.mass;
-		});
-	return acc;
-}
-
-void sub_step()
-{
-	std::for_each(std::execution::par_unseq,
-		bodies.begin(),
-		bodies.end(),
-		[&](body& body)
-		{
-			const auto acceleration = get_raw_gravity_at(body.position);
-			body.velocity += acceleration * delta_t;
-		});
-
-	std::for_each(std::execution::par_unseq,
-		bodies.begin(),
-		bodies.end(),
-		[&](body& body)
-		{
-			body.position += body.velocity * delta_t;
-		});
-}
-
-void initialization()
-{
-	std::random_device rd;
-	std::mt19937 e2(rd());
-	const std::uniform_real_distribution<> dist(0, 1);
-
-	std::for_each(std::execution::par_unseq,
-		bodies.begin(),
-		bodies.end(),
-		[&](body& body)
-		{
-			body.position.x = dist(e2);
-			body.position.y = dist(e2);
-			body.mass = dist(e2);
-		});
+	return log(abs(i - j));
 }
 
 int main()
 {
-	const vec2 x1{ 0.25, 0.5 };
-	const vec2 x2{ 0.55, 0.75 };
-	const std::complex<double> z1(0.25, 0.5);
-	const std::complex<double> z2(0.55, 0.75);
+	constexpr size_t num_bodies = 10;
+	std::vector<std::unique_ptr<body>> bodies;
+	std::array<vec2, num_bodies> forces;
 
-	std::cout << log(sqrt((x1 - x2).norm_sqr())) << std::endl;
-	std::cout << std::real(log(abs(z1 - z2))) << std::endl;
+	for (size_t i = 0; i < num_bodies; ++i)
+	{
+		const auto& pos = vec2{ my_rand(), my_rand() };
+		const auto& mass = my_rand() * 1.5;
+
+		bodies.push_back(std::make_unique<body>(pos, mass));
+	}
+
+	//std::cout << log(abs(z1 - z2)) << std::endl;
+
+	for (size_t i = 0; i < num_bodies; ++i)
+	{
+		forces[i] = { 0, 0 };
+		for (size_t j = 0; j < num_bodies; ++j)
+		{
+			if (i == j)
+			{
+				continue;
+			}
+			forces[i] += bodies[j]->mass * kernel_func(bodies[i]->pos, bodies[j]->pos);
+		}
+	}
 
 	return EXIT_SUCCESS;
 }
