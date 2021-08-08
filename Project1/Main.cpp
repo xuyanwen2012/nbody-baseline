@@ -4,6 +4,7 @@
 #include <iostream>
 #include <random>
 #include <chrono>
+#include <complex>
 
 #include "Vec2.h"
 
@@ -18,7 +19,7 @@ struct body
 	alignas(16) double mass;
 };
 
-constexpr int num_particles = 1024;
+constexpr int num_particles = 65536;
 
 std::array<body, num_particles> bodies;
 
@@ -33,7 +34,7 @@ vec2 get_raw_gravity_at(const vec2 position)
 	vec2 acc{};
 	std::for_each(bodies.begin(),
 		bodies.end(),
-		[&](body& body)
+		[&](const body& body)
 		{
 			acc += gravity_func(body.position - position) * body.mass;
 		});
@@ -64,7 +65,7 @@ void initialization()
 {
 	std::random_device rd;
 	std::mt19937 e2(rd());
-	std::uniform_real_distribution<> dist(0, 1);
+	const std::uniform_real_distribution<> dist(0, 1);
 
 	std::for_each(std::execution::par_unseq,
 		bodies.begin(),
@@ -77,28 +78,15 @@ void initialization()
 		});
 }
 
-void print_results(const char* const tag,
-	const high_resolution_clock::time_point start_time,
-	const high_resolution_clock::time_point end_time)
-{
-	std::cout << tag << ": "
-		<< "Time: " << duration_cast<duration<double>>(end_time - start_time).count() << "s"
-		<< std::endl;
-}
-
 int main()
 {
-	initialization();
-	const auto t1 = high_resolution_clock::now();
+	const vec2 x1{ 0.25, 0.5 };
+	const vec2 x2{ 0.55, 0.75 };
+	const std::complex<double> z1(0.25, 0.5);
+	const std::complex<double> z2(0.55, 0.75);
 
-	for (int i = 0; i < 100; ++i)
-	{
-		sub_step();
-	}
-
-	const auto t2 = high_resolution_clock::now();
-
-	print_results("par", t1, t2);
+	std::cout << log(sqrt((x1 - x2).norm_sqr())) << std::endl;
+	std::cout << std::real(log(abs(z1 - z2))) << std::endl;
 
 	return EXIT_SUCCESS;
 }
