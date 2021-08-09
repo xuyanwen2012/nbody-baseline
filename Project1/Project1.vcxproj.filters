@@ -18,9 +18,12 @@
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BalancedQuadtree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Vec2.h">
+    <ClInclude Include="BalancedQuadtree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
