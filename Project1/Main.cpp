@@ -43,8 +43,6 @@ int main()
 		bodies.push_back(std::make_unique<body>(pos, mass));
 	}
 
-	//std::cout << log(abs(z1 - z2)) << std::endl;
-
 	for (size_t i = 0; i < num_bodies; ++i)
 	{
 		forces[i] = { 0, 0 };
