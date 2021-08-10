@@ -6,7 +6,7 @@
 adaptive::quadtree::quadtree()
 {
 	num_particles_ = 0;
-	root_ = tree_node(0, rect{ 0.5, 0.5, 1.0, 1.0 }, 0);
+	root_ = tree_node(1, rect{ 0.5, 0.5, 1.0, 1.0 }, 0);
 }
 
 void adaptive::quadtree::allocate_node_for_particle(const std::shared_ptr<body>& body_ptr)
@@ -31,8 +31,6 @@ void adaptive::quadtree::allocate_node_for_particle(const std::shared_ptr<body>&
 		split_node(cur_node, cur_node->content);
 		cur_node->content.reset();
 	}
-
-	//root_.bounding_box.center
 }
 
 void adaptive::quadtree::compute_center_of_mass()
@@ -42,7 +40,7 @@ void adaptive::quadtree::compute_center_of_mass()
 	queue.push(&root_);
 	while (!queue.empty())
 	{
-		auto cur = queue.front();
+		const auto cur = queue.front();
 		queue.pop();
 
 		if (!cur->is_leaf())
