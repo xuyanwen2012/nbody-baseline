@@ -149,11 +149,13 @@
   <ItemGroup>
     <ClCompile Include="AdaptiveQuadtree.cpp" />
     <ClCompile Include="BalancedQuadtree.cpp" />
+    <ClCompile Include="body.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AdaptiveQuadtree.h" />
     <ClInclude Include="BalancedQuadtree.h" />
+    <ClInclude Include="Body.h" />
     <ClInclude Include="Rect.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

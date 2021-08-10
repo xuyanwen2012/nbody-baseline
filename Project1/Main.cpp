@@ -6,31 +6,13 @@
 #include <complex>
 
 #include "AdaptiveQuadtree.h"
-#include "BalancedQuadtree.h"
-
-using vec2 = std::complex<double>;
+#include "Body.h"
 
 double my_rand()
 {
 	static thread_local std::mt19937 generator;
 	const std::uniform_real_distribution distribution(0.0, 1.0);
 	return distribution(generator);
-}
-
-struct body
-{
-	body(const vec2 pos, const double mass) : pos(pos), mass(mass)
-	{
-	}
-
-	vec2 pos;
-	double mass;
-};
-
-vec2 kernel_func(const vec2& i, const vec2& j)
-{
-	// complex number notation
-	return log(abs(i - j));
 }
 
 int main()
@@ -67,7 +49,7 @@ int main()
 	}
 
 	// Do the NlogN
-	auto qt = adaptive::quadtree(4);
-
+	auto qt = adaptive::quadtree();
+	qt.allocate_node_for_particle(bodies.at(0));
 	return EXIT_SUCCESS;
 }
