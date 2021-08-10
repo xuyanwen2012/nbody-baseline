@@ -38,6 +38,6 @@ namespace adaptive
 		tree_node root_;
 
 		static direction determine_quadrant(const tree_node* node, const std::shared_ptr<body>& body);
-		static void split_node(tree_node* node);
+		static void split_node(tree_node* node, const std::shared_ptr<body>& body_ptr);
 	};
 }

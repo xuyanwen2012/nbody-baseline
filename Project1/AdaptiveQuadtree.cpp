@@ -23,8 +23,8 @@ void adaptive::quadtree::allocate_node_for_particle(const std::shared_ptr<body>&
 	}
 	else
 	{
+		split_node(cur_node, cur_node->content);
 		cur_node->content.reset();
-		split_node(cur_node);
 	}
 
 	//root_.bounding_box.center
@@ -52,7 +52,7 @@ adaptive::direction adaptive::quadtree::determine_quadrant(const tree_node* node
 	return direction::ne;
 }
 
-void adaptive::quadtree::split_node(tree_node* node)
+void adaptive::quadtree::split_node(tree_node* node, const std::shared_ptr<body>& body_ptr)
 {
 	const auto hw = node->bounding_box.size.real() / 2.0;
 	const auto hh = node->bounding_box.size.imag() / 2.0;
@@ -67,4 +67,7 @@ void adaptive::quadtree::split_node(tree_node* node)
 	const auto ne = new tree_node{ rect{ cx + hw / 2.0, cy + hh / 2.0, hw, hh }, next_level };
 
 	node->children = std::optional<std::array<tree_node*, 4>>{ {sw, se, nw, ne} };
+
+	const auto new_quadrant = static_cast<size_t>(determine_quadrant(node, body_ptr));
+	node->children->at(new_quadrant)->content = body_ptr;
 }
