@@ -33,6 +33,10 @@ namespace adaptive
 		std::optional<std::array<tree_node*, 4>> children;
 
 		[[nodiscard]] bool is_leaf() const { return !children.has_value(); }
+
+		void insert_body(const std::shared_ptr<body>& body_ptr);
+		[[nodiscard]] direction determine_quadrant(const std::shared_ptr<body>& body) const;
+		void split();
 	};
 
 	class quadtree
@@ -45,8 +49,5 @@ namespace adaptive
 	private:
 		tree_node root_;
 		size_t num_particles_;
-
-		static direction determine_quadrant(const tree_node* node, const std::shared_ptr<body>& body);
-		static void split_node(tree_node* node, const std::shared_ptr<body>& body_ptr);
 	};
 }
