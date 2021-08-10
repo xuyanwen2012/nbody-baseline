@@ -1,8 +1,10 @@
 #include "AdaptiveQuadtree.h"
 
+#include <queue>
+
 adaptive::quadtree::quadtree()
 {
-	root_ = tree_node(rect{ 0.5, 0.5, 1.0, 1.0 }, 0);
+	root_ = tree_node(0, rect{ 0.5, 0.5, 1.0, 1.0 }, 0);
 }
 
 void adaptive::quadtree::allocate_node_for_particle(const std::shared_ptr<body>& body_ptr)
@@ -28,6 +30,11 @@ void adaptive::quadtree::allocate_node_for_particle(const std::shared_ptr<body>&
 	}
 
 	//root_.bounding_box.center
+}
+
+void adaptive::quadtree::compute_center_of_mass()
+{
+	std::queue<tree_node*> queue;
 }
 
 adaptive::direction adaptive::quadtree::determine_quadrant(const tree_node* node, const std::shared_ptr<body>& body)
@@ -61,10 +68,12 @@ void adaptive::quadtree::split_node(tree_node* node, const std::shared_ptr<body>
 
 	const auto next_level = node->level + 1;
 
-	const auto sw = new tree_node{ rect{cx - hw / 2.0, cy - hh / 2.0, hw, hh}, next_level };
-	const auto se = new tree_node{ rect{cx + hw / 2.0, cy - hh / 2.0, hw, hh}, next_level };
-	const auto nw = new tree_node{ rect{cx - hw / 2.0, cy + hh / 2.0, hw, hh}, next_level };
-	const auto ne = new tree_node{ rect{cx + hw / 2.0, cy + hh / 2.0, hw, hh}, next_level };
+	const auto my_uid = node->uid * 10;
+
+	const auto sw = new tree_node{ my_uid + 0, rect{cx - hw / 2.0, cy - hh / 2.0, hw, hh}, next_level };
+	const auto se = new tree_node{ my_uid + 1, rect{cx + hw / 2.0, cy - hh / 2.0, hw, hh}, next_level };
+	const auto nw = new tree_node{ my_uid + 2, rect{cx - hw / 2.0, cy + hh / 2.0, hw, hh}, next_level };
+	const auto ne = new tree_node{ my_uid + 3, rect{cx + hw / 2.0, cy + hh / 2.0, hw, hh}, next_level };
 
 	node->children = std::optional<std::array<tree_node*, 4>>{ {sw, se, nw, ne} };
 

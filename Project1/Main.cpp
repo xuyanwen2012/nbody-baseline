@@ -34,7 +34,7 @@ int main()
 		bodies.push_back(std::make_shared<body>(pos, mass));
 	}
 
-	// Do the N squared
+	// -------- Do the N squared --------
 	for (size_t i = 0; i < num_bodies; ++i)
 	{
 		forces_n_squared[i] = { 0, 0 };
@@ -48,12 +48,18 @@ int main()
 		}
 	}
 
-	// Do the NlogN
+	// -------- Do the NlogN --------
 	auto qt = adaptive::quadtree();
+
+	// 1) Construct the Quadtree
 	for (const auto& body_ptr : bodies)
 	{
 		qt.allocate_node_for_particle(body_ptr);
 	}
+
+	// 2) Calculate Centers of Mass
+
+	// 3) Estimate N-Body Forces
 
 	return EXIT_SUCCESS;
 }
