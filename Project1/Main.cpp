@@ -50,6 +50,10 @@ int main()
 
 	// Do the NlogN
 	auto qt = adaptive::quadtree();
-	qt.allocate_node_for_particle(bodies.at(0));
+	for (const auto& body_ptr : bodies)
+	{
+		qt.allocate_node_for_particle(body_ptr);
+	}
+
 	return EXIT_SUCCESS;
 }

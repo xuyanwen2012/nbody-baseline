@@ -12,12 +12,12 @@ namespace adaptive
 
 	struct tree_node
 	{
-		tree_node() : is_leaf(true), level(0) {}
+		tree_node() : level(0) {}
 
 		tree_node(const rect<double> bound, const size_t level)
-			: is_leaf(true), level(level), bounding_box(bound) {}
+			: level(level), bounding_box(bound) {}
 
-		bool is_leaf;
+		bool is_leaf() const { return !children.has_value(); }
 		size_t level;
 		rect<double> bounding_box;
 		std::shared_ptr<body> content;
@@ -26,7 +26,7 @@ namespace adaptive
 		/// ---+---
 		///	 0 | 1
 		/// </summary>
-		std::array<std::optional<tree_node*>, 4> children;
+		std::optional<std::array<tree_node*, 4>> children;
 	};
 
 	class quadtree
@@ -38,6 +38,6 @@ namespace adaptive
 		tree_node root_;
 
 		static direction determine_quadrant(const tree_node* node, const std::shared_ptr<body>& body);
-		void split_node(tree_node* node);
+		static void split_node(tree_node* node);
 	};
 }
