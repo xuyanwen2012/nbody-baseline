@@ -1,35 +1,43 @@
 #include "BalancedQuadtree.h"
 
-tree_node::~tree_node()
-{
-	for (const auto child : children)
-	{
-		delete child;
-	}
-}
+//tree_node::tree_node(double x, double y, double w, double h, const size_t level) : is_leaf(true), level(level)
+//{
+//	bounding_box = { {x, y}, {w, h} };
+//}
 
 void tree_node::subdivide(const size_t max_depth)
 {
 	is_leaf = false;
 	const auto next_level = level + 1;
 
-	const auto hw = real(bounding_box.size) / 2.0;
-	const auto hh = imag(bounding_box.size) / 2.0;
-	const auto cx = real(bounding_box.center);
-	const auto cy = imag(bounding_box.center);
-
-	const auto sw = new tree_node(cx - hw, cy - hh, hw, hh, next_level);
-	const auto se = new tree_node(cx + hw, cy - hh, hw, hh, next_level);
-	const auto nw = new tree_node(cx - hw, cy + hh, hw, hh, next_level);
-	const auto ne = new tree_node(cx + hw, cy + hh, hw, hh, next_level);
-
-	children = std::array<tree_node*, 4>{ {sw, se, nw, ne } };
-
 	if (next_level >= max_depth)
 	{
 		is_leaf = true;
 		return;
 	}
+
+	const auto hw = real(bounding_box.size) / 2.0;
+	const auto hh = imag(bounding_box.size) / 2.0;
+	const auto cx = real(bounding_box.center);
+	const auto cy = imag(bounding_box.center);
+
+	const auto sw = new tree_node{};
+	sw->bounding_box = rect{ {cx - hw / 2.0, cy - hh / 2.0}, {hw, hh} };
+	sw->level = next_level;
+
+	const auto se = new tree_node{};
+	se->bounding_box = rect{ {cx + hw / 2.0, cy - hh / 2.0}, {hw, hh} };
+	se->level = next_level;
+
+	const auto nw = new tree_node{};
+	nw->bounding_box = rect{ {cx - hw / 2.0, cy + hh / 2.0}, {hw, hh} };
+	nw->level = next_level;
+
+	const auto ne = new tree_node{};
+	ne->bounding_box = rect{ {cx + hw / 2.0, cy + hh / 2.0}, {hw, hh} };
+	ne->level = next_level;
+
+	children = std::array<tree_node*, 4>{ {sw, se, nw, ne } };
 
 	for (const auto child : children)
 	{
@@ -39,8 +47,10 @@ void tree_node::subdivide(const size_t max_depth)
 
 balanced_quadtree::balanced_quadtree(const size_t depth) : max_depth_(depth)
 {
-	auto root = tree_node{ 0.5, 0.5, 1.0, 1.0, 0 };
-	root.subdivide(depth);
+	root_ = tree_node{};
+	root_.bounding_box = { {0.5, 0.5}, {1.0, 1.0} };
+	root_.level = 0;
+	root_.subdivide(max_depth_);
 }
 
 void balanced_quadtree::allocate_node_for_particle(const std::shared_ptr<body>& body_ptr)
