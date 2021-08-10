@@ -11,13 +11,17 @@ void adaptive::quadtree::allocate_node_for_particle(std::shared_ptr<body> body_p
 
 	while (!cur_node.is_leaf && cur_node.content != nullptr)
 	{
-		auto child = cur_node.children.at(0);
-		//
+		const auto index = static_cast<size_t>(determine_quadrant(&cur_node, body_ptr));
+
+		auto child = cur_node.children.at(index);
 		if (child.has_value())
 		{
+			cur_node = *child.value();
 		}
 		else
 		{
+			// should sub divide this node
+			//child = new tree_node(rect{})
 		}
 	}
 
@@ -44,4 +48,8 @@ adaptive::direction adaptive::quadtree::determine_quadrant(const tree_node* node
 		return direction::se;
 	}
 	return direction::ne;
+}
+
+void adaptive::quadtree::split_node(tree_node* node)
+{
 }
