@@ -24,9 +24,11 @@ struct tree_node
 class balanced_quadtree
 {
 public:
-	size_t max_depth;
 	balanced_quadtree(const size_t depth);
 
 private:
+	size_t max_depth_;
 	std::vector<tree_node> nodes_;
+
+	std::pair<size_t, size_t> get_nodes_at_level(size_t level) const;
 };
