@@ -1,6 +1,7 @@
 #include "AdaptiveQuadtree.h"
 
 #include <iostream>
+#include <list>
 #include <queue>
 
 void adaptive::tree_node::insert_body(const std::shared_ptr<body>& body_ptr)
@@ -82,6 +83,7 @@ void adaptive::quadtree::allocate_node_for_particle(const std::shared_ptr<body>&
 void adaptive::quadtree::compute_center_of_mass()
 {
 	std::queue<tree_node*> queue;
+	std::vector<tree_node*> list;
 
 	queue.push(&root_);
 	while (!queue.empty())
@@ -97,11 +99,36 @@ void adaptive::quadtree::compute_center_of_mass()
 			}
 		}
 
-		std::cout << cur->uid;
-		if (cur->content != nullptr)
-		{
-			std::cout << " - " << cur->content->uid;
-		}
-		std::cout << std::endl;
+		list.push_back(cur);
 	}
+
+	std::for_each(list.rbegin(), list.rend(),
+		[&](tree_node* node)
+		{
+			// sum the masses
+			double sum = 0.0;
+			if (node->is_leaf())
+			{
+				if (node->content != nullptr)
+				{
+					sum = node->content->mass;
+				}
+			}
+			else
+			{
+				for (const tree_node* child : node->children.value())
+				{
+					sum += child->node_mass;
+				}
+			}
+
+			node->node_mass = sum;
+
+			std::cout << node->uid;
+			if (node->content != nullptr)
+			{
+				std::cout << " - " << node->content->uid;
+			}
+			std::cout << std::endl;
+		});
 }
