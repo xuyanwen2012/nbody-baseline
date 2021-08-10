@@ -6,10 +6,11 @@ using vec2 = std::complex<double>;
 
 struct body
 {
-	body(const vec2 pos, const double mass) : pos(pos), mass(mass)
+	body(const int uid, const vec2 pos, const double mass) : uid(uid), pos(pos), mass(mass)
 	{
 	}
 
+	int uid;
 	vec2 pos;
 	double mass;
 };

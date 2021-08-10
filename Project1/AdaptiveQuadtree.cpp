@@ -1,14 +1,17 @@
 #include "AdaptiveQuadtree.h"
 
+#include <iostream>
 #include <queue>
 
 adaptive::quadtree::quadtree()
 {
+	num_particles_ = 0;
 	root_ = tree_node(0, rect{ 0.5, 0.5, 1.0, 1.0 }, 0);
 }
 
 void adaptive::quadtree::allocate_node_for_particle(const std::shared_ptr<body>& body_ptr)
 {
+	++num_particles_;
 	tree_node* cur_node = &root_;
 
 	while (!cur_node->is_leaf())
@@ -35,6 +38,28 @@ void adaptive::quadtree::allocate_node_for_particle(const std::shared_ptr<body>&
 void adaptive::quadtree::compute_center_of_mass()
 {
 	std::queue<tree_node*> queue;
+
+	queue.push(&root_);
+	while (!queue.empty())
+	{
+		auto cur = queue.front();
+		queue.pop();
+
+		if (!cur->is_leaf())
+		{
+			for (auto child : cur->children.value())
+			{
+				queue.push(child);
+			}
+		}
+
+		std::cout << cur->uid;
+		if (cur->content != nullptr)
+		{
+			std::cout << " - " << cur->content->uid;
+		}
+		std::cout << std::endl;
+	}
 }
 
 adaptive::direction adaptive::quadtree::determine_quadrant(const tree_node* node, const std::shared_ptr<body>& body)

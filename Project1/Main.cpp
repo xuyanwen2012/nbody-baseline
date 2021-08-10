@@ -31,7 +31,7 @@ int main()
 		const auto& pos = vec2{ my_rand(), my_rand() };
 		const auto& mass = my_rand() * 1.5;
 
-		bodies.push_back(std::make_shared<body>(pos, mass));
+		bodies.push_back(std::make_shared<body>(i, pos, mass));
 	}
 
 	// -------- Do the N squared --------
@@ -58,6 +58,7 @@ int main()
 	}
 
 	// 2) Calculate Centers of Mass
+	qt.compute_center_of_mass();
 
 	// 3) Estimate N-Body Forces
 

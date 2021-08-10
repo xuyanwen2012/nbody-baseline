@@ -40,10 +40,11 @@ namespace adaptive
 	public:
 		quadtree();
 		void allocate_node_for_particle(const std::shared_ptr<body>& body_ptr);
+		void compute_center_of_mass();
+
 	private:
 		tree_node root_;
-
-		void compute_center_of_mass();
+		size_t num_particles_;
 
 		static direction determine_quadrant(const tree_node* node, const std::shared_ptr<body>& body);
 		static void split_node(tree_node* node, const std::shared_ptr<body>& body_ptr);
