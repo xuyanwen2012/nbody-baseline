@@ -3,33 +3,31 @@
 #include <complex>
 #include <vector>
 
+#include "Rect.h"
+
 struct body;
 
-struct rect
+namespace balanced
 {
-	std::complex<double> center;
-	std::complex<double> size;
-};
+	struct tree_node
+	{
+		bool is_leaf;
+		size_t level;
+		rect bounding_box;
+		std::array<tree_node*, 4> children;
+		void subdivide(size_t max_depth);
+	};
 
-struct tree_node
-{
-	bool is_leaf;
-	size_t level;
-	rect bounding_box;
-	std::array<tree_node*, 4> children;
+	class quadtree
+	{
+	public:
+		quadtree(size_t depth);
 
-	void subdivide(size_t max_depth);
-};
+		void allocate_node_for_particle(const std::shared_ptr<body>& body_ptr);
 
-class balanced_quadtree
-{
-public:
-	balanced_quadtree(size_t depth);
-
-	void allocate_node_for_particle(const std::shared_ptr<body>& body_ptr);
-
-private:
-	tree_node root_;
-	size_t max_depth_;
-	std::vector<tree_node> nodes_;
-};
+	private:
+		tree_node root_;
+		size_t max_depth_;
+		std::vector<tree_node> nodes_;
+	};
+}

@@ -5,6 +5,7 @@
 #include <random>
 #include <complex>
 
+#include "AdaptiveQuadtree.h"
 #include "BalancedQuadtree.h"
 
 using vec2 = std::complex<double>;
@@ -61,7 +62,7 @@ int main()
 		}
 	}
 
-	auto qt = balanced_quadtree(4);
+	auto qt = adaptive::quadtree(4);
 
 	return EXIT_SUCCESS;
 }
