@@ -10,13 +10,13 @@ namespace adaptive
 	struct body;
 	struct tree_node
 	{
-		tree_node() : is_leaf(true), level(0), bounding_box() {}
-		tree_node(const rect bound, const size_t level)
+		tree_node() : is_leaf(true), level(0) {}
+		tree_node(const rect<double> bound, const size_t level)
 			: is_leaf(true), level(level), bounding_box(bound) {}
 
 		bool is_leaf;
 		size_t level;
-		rect bounding_box;
+		rect<double> bounding_box;
 		std::shared_ptr<body> content;
 		std::array<std::optional<tree_node*>, 4> children;
 	};

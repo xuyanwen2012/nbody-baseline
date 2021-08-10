@@ -13,7 +13,7 @@ namespace balanced
 	{
 		bool is_leaf;
 		size_t level;
-		rect bounding_box;
+		rect<double> bounding_box;
 		std::array<tree_node*, 4> children;
 		void subdivide(size_t max_depth);
 	};
