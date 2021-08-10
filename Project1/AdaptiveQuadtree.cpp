@@ -61,10 +61,10 @@ void adaptive::quadtree::split_node(tree_node* node, const std::shared_ptr<body>
 
 	const auto next_level = node->level + 1;
 
-	const auto sw = new tree_node{ rect{ cx - hw / 2.0, cy - hh / 2.0, hw, hh }, next_level };
-	const auto se = new tree_node{ rect{ cx + hw / 2.0, cy - hh / 2.0, hw, hh }, next_level };
-	const auto nw = new tree_node{ rect{ cx - hw / 2.0, cy + hh / 2.0, hw, hh }, next_level };
-	const auto ne = new tree_node{ rect{ cx + hw / 2.0, cy + hh / 2.0, hw, hh }, next_level };
+	const auto sw = new tree_node{ rect{cx - hw / 2.0, cy - hh / 2.0, hw, hh}, next_level };
+	const auto se = new tree_node{ rect{cx + hw / 2.0, cy - hh / 2.0, hw, hh}, next_level };
+	const auto nw = new tree_node{ rect{cx - hw / 2.0, cy + hh / 2.0, hw, hh}, next_level };
+	const auto ne = new tree_node{ rect{cx + hw / 2.0, cy + hh / 2.0, hw, hh}, next_level };
 
 	node->children = std::optional<std::array<tree_node*, 4>>{ {sw, se, nw, ne} };
 

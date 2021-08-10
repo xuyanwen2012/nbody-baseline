@@ -12,10 +12,14 @@ namespace adaptive
 
 	struct tree_node
 	{
-		tree_node() : level(0) {}
+		tree_node() : level(0)
+		{
+		}
 
 		tree_node(const rect<double> bound, const size_t level)
-			: level(level), bounding_box(bound) {}
+			: level(level), bounding_box(bound)
+		{
+		}
 
 		bool is_leaf() const { return !children.has_value(); }
 		size_t level;
