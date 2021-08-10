@@ -3,7 +3,7 @@
 
 template <
 	typename T,
-	typename = std::enable_if_t<std::is_arithmetic_v<T>, T>
+	typename = std::enable_if_t<std::is_floating_point_v<T>, T>
 >
 struct rect
 {
