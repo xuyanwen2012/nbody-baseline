@@ -5,15 +5,15 @@ adaptive::quadtree::quadtree()
 	root_ = tree_node(rect{ 0.5, 0.5, 1.0, 1.0 }, 0);
 }
 
-void adaptive::quadtree::allocate_node_for_particle(std::shared_ptr<body> body_ptr)
+void adaptive::quadtree::allocate_node_for_particle(const std::shared_ptr<body>& body_ptr)
 {
 	tree_node* cur_node = &root_;
 
 	while (!cur_node->is_leaf())
 	{
-		const auto index = static_cast<size_t>(determine_quadrant(cur_node, body_ptr));
+		const auto quadrant = static_cast<size_t>(determine_quadrant(cur_node, body_ptr));
 
-		auto child = cur_node->children->at(index);
+		const auto child = cur_node->children->at(quadrant);
 		cur_node = child;
 	}
 
@@ -23,6 +23,7 @@ void adaptive::quadtree::allocate_node_for_particle(std::shared_ptr<body> body_p
 	}
 	else
 	{
+		cur_node->content.reset();
 		split_node(cur_node);
 	}
 

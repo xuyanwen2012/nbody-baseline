@@ -33,7 +33,7 @@ namespace adaptive
 	{
 	public:
 		quadtree();
-		void allocate_node_for_particle(std::shared_ptr<body> body_ptr);
+		void allocate_node_for_particle(const std::shared_ptr<body>& body_ptr);
 	private:
 		tree_node root_;
 
