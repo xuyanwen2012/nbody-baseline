@@ -1,36 +1,50 @@
 #include <algorithm>
-#include <array>
-#include <execution>
 #include <iostream>
 #include <random>
 #include <complex>
+#include <cstdlib>
 
 #include "AdaptiveQuadtree.h"
 #include "Body.h"
 
-double my_rand()
+
+double f_rand(const double f_min = 0.0, const double f_max = 1.0)
 {
-	static thread_local std::mt19937 generator;
-	const std::uniform_real_distribution distribution(0.0, 1.0);
-	return distribution(generator);
+	const double f = static_cast<double>(rand()) / RAND_MAX;
+	return f_min + f * (f_max - f_min);
 }
 
-int main()
+void estimate_forces(const size_t num_bodies,
+                     std::vector<vec2>& forces_n_log_n,
+                     adaptive::quadtree& qt,
+                     const std::vector<std::shared_ptr<body>>& bodies)
 {
-	constexpr size_t num_bodies = 4096;
+	for (size_t i = 0; i < num_bodies; ++i)
+	{
+		forces_n_log_n.push_back(qt.compute_force_at(bodies[i]->pos));
+	}
+}
+
+int main(const int argc, char* argv[])
+{
+	size_t num_bodies = 1024 * 1024;
+	if (argc == 2)
+	{
+		num_bodies = atoi(argv[1]);
+	}
 	constexpr bool show_rmse = false;
 
 	// The main particle table
 	std::vector<std::shared_ptr<body>> bodies;
 
-	std::array<vec2, num_bodies> forces_n_squared;
-	std::array<vec2, num_bodies> forces_n_log_n;
+	std::vector<vec2> forces_n_squared;
+	std::vector<vec2> forces_n_log_n;
 
 	// Initialization of positions/masses
 	for (size_t i = 0; i < num_bodies; ++i)
 	{
-		const auto& pos = vec2{my_rand(), my_rand()};
-		const auto& mass = my_rand() * 1.5;
+		const auto& pos = vec2{f_rand(), f_rand()};
+		const auto& mass = f_rand() * 1.5;
 
 		bodies.push_back(std::make_shared<body>(i, pos, mass));
 	}
@@ -73,10 +87,8 @@ int main()
 	qt.compute_center_of_mass();
 
 	// 3) Estimate N-Body Forces
-	for (size_t i = 0; i < num_bodies; ++i)
-	{
-		forces_n_log_n[i] = qt.compute_force_at(bodies[i]->pos);
-	}
+	// TODO: put int a function
+
 
 	// -------- Do Analysis --------
 
@@ -88,7 +100,7 @@ int main()
 			tmp += pow(forces_n_squared[i] - forces_n_log_n[i], 2);
 		}
 
-		constexpr auto n = static_cast<double>(num_bodies);
+		const auto n = static_cast<double>(num_bodies);
 		const auto rsme = sqrt(tmp / n);
 		std::cout << "RSME = " << rsme << std::endl;
 	}
