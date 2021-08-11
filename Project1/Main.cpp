@@ -3,102 +3,95 @@
 #include <execution>
 #include <iostream>
 #include <random>
-#include <chrono>
+#include <complex>
 
-#include "Vec2.h"
+#include "AdaptiveQuadtree.h"
+#include "Body.h"
 
-using namespace std::chrono;
-
-constexpr double delta_t = 0.00005;
-
-struct body
+double my_rand()
 {
-	vec2 position;
-	vec2 velocity;
-	alignas(16) double mass;
-};
-
-constexpr size_t num_particles = 1024;
-
-std::array<body, num_particles> bodies;
-
-vec2 gravity_func(const vec2 distance)
-{
-	const double l2 = distance.norm_sqr() + 1e-3;
-	return distance * pow(l2, -3.0 / 2.0);
-}
-
-vec2 get_raw_gravity_at(const vec2 position)
-{
-	vec2 acc{};
-	std::for_each(bodies.begin(),
-		bodies.end(),
-		[&](body& body)
-		{
-			acc += gravity_func(body.position - position) * body.mass;
-		});
-	return acc;
-}
-
-void sub_step()
-{
-	std::for_each(std::execution::par,
-		bodies.begin(),
-		bodies.end(),
-		[&](body& body)
-		{
-			const auto acceleration = get_raw_gravity_at(body.position);
-			body.velocity += acceleration * delta_t;
-		});
-
-	std::for_each(std::execution::par,
-		bodies.begin(),
-		bodies.end(),
-		[&](body& body)
-		{
-			body.position += body.velocity * delta_t;
-		});
-}
-
-void initialization()
-{
-	std::random_device rd;
-	std::mt19937 e2(rd());
-	std::uniform_real_distribution<> dist(0, 1);
-
-	std::for_each(std::execution::par_unseq,
-		bodies.begin(),
-		bodies.end(),
-		[&](body& body)
-		{
-			body.position.x = dist(e2);
-			body.position.y = dist(e2);
-			body.mass = dist(e2);
-		});
-}
-
-void print_results(const char* const tag,
-	const high_resolution_clock::time_point start_time,
-	const high_resolution_clock::time_point end_time)
-{
-	std::cout << tag << ": "
-		<< "Time: " << duration_cast<duration<double>>(end_time - start_time).count() << "s"
-		<< std::endl;
+	static thread_local std::mt19937 generator;
+	const std::uniform_real_distribution distribution(0.0, 1.0);
+	return distribution(generator);
 }
 
 int main()
 {
-	initialization();
-	const auto t1 = high_resolution_clock::now();
+	constexpr size_t num_bodies = 4096;
+	constexpr bool show_rmse = false;
 
-	for (int i = 0; i < 100; ++i)
+	// The main particle table
+	std::vector<std::shared_ptr<body>> bodies;
+
+	std::array<vec2, num_bodies> forces_n_squared;
+	std::array<vec2, num_bodies> forces_n_log_n;
+
+	// Initialization of positions/masses
+	for (size_t i = 0; i < num_bodies; ++i)
 	{
-		sub_step();
+		const auto& pos = vec2{my_rand(), my_rand()};
+		const auto& mass = my_rand() * 1.5;
+
+		bodies.push_back(std::make_shared<body>(i, pos, mass));
 	}
 
-	const auto t2 = high_resolution_clock::now();
+	// -------- Do the N squared --------
+	if (show_rmse)
+	{
+		for (size_t i = 0; i < num_bodies; ++i)
+		{
+			forces_n_squared[i] = {0, 0};
+			for (size_t j = 0; j < num_bodies; ++j)
+			{
+				if (i == j)
+				{
+					continue;
+				}
 
-	print_results("par", t1, t2);
+				const auto force = kernel_func(
+					bodies[i]->pos,
+					bodies[j]->pos
+				);
+
+				const auto fm = bodies[j]->mass * force;
+
+				forces_n_squared[i] += fm;
+			}
+		}
+	}
+
+	// -------- Do the NlogN --------
+	auto qt = adaptive::quadtree();
+
+	// 1) Construct the Quadtree
+	for (const auto& body_ptr : bodies)
+	{
+		qt.allocate_node_for_particle(body_ptr);
+	}
+
+	// 2) Calculate Centers of Mass
+	qt.compute_center_of_mass();
+
+	// 3) Estimate N-Body Forces
+	for (size_t i = 0; i < num_bodies; ++i)
+	{
+		forces_n_log_n[i] = qt.compute_force_at(bodies[i]->pos);
+	}
+
+	// -------- Do Analysis --------
+
+	if (show_rmse)
+	{
+		vec2 tmp;
+		for (size_t i = 0; i < num_bodies; ++i)
+		{
+			tmp += pow(forces_n_squared[i] - forces_n_log_n[i], 2);
+		}
+
+		constexpr auto n = static_cast<double>(num_bodies);
+		const auto rsme = sqrt(tmp / n);
+		std::cout << "RSME = " << rsme << std::endl;
+	}
 
 	return EXIT_SUCCESS;
 }
