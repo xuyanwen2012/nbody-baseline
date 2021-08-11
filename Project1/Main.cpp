@@ -71,8 +71,10 @@ int main()
 	// 3) Estimate N-Body Forces
 	for (size_t i = 0; i < num_bodies; ++i)
 	{
-		forces_n_log_n[i] = qt.get_gravity_at(bodies[i]->pos);
+		forces_n_log_n[i] = qt.compute_force_at(bodies[i]->pos);
 	}
+
+	// -------- Do Analysis --------
 
 	return EXIT_SUCCESS;
 }

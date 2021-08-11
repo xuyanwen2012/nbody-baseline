@@ -74,7 +74,17 @@ namespace adaptive
 		/// </summary>
 		direction determine_quadrant(const vec2& pos) const;
 
+		/// <summary>
+		///
+		/// </summary>
+		std::complex<double> center_of_mass() const { return weighted_pos / node_mass; }
+
+		/// <summary>
+		///
+		/// </summary>
+		std::complex<double> get_gravity_at(const vec2& pos);
 	private:
+
 		/// <summary>
 		///
 		/// </summary>
@@ -93,7 +103,7 @@ namespace adaptive
 		quadtree();
 		void allocate_node_for_particle(const std::shared_ptr<body>& body_ptr);
 		void compute_center_of_mass();
-		std::complex<double> get_gravity_at(const vec2& pos);
+		std::complex<double> compute_force_at(const vec2& pos);
 
 	private:
 		tree_node root_;

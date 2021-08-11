@@ -5,6 +5,50 @@
 #include <numeric>
 #include <queue>
 
+std::complex<double> adaptive::tree_node::get_gravity_at(const vec2& pos)
+{
+	std::complex<double> acc;
+
+	if (is_leaf())
+	{
+		if (content->pos == pos) // making sure i != i
+		{
+			return 0;
+		}
+
+		// Direct computation
+		const auto f = kernel_func(content->pos, pos);
+		return content->mass * f;
+	}
+
+	const auto com = center_of_mass();
+	const auto distance = com - pos;
+	const auto norm = abs(distance);
+	const auto geo_size = bounding_box.size.real();
+
+	if (static double theta = 1.0; geo_size / norm < theta)
+	{
+		// we treat the quadtree cell as a source of long-range forces and use its center of mass.
+		const auto f = kernel_func(com, pos);
+		acc += node_mass * f;
+	}
+	else
+	{
+		// Otherwise, we will recursively visit the child cells in the quadtree.
+		for (const auto child : children.value())
+		{
+			if (child->is_leaf() && child->is_empty())
+			{
+				continue;
+			}
+
+			acc += child->get_gravity_at(pos);
+		}
+	}
+
+	return acc;
+}
+
 void adaptive::tree_node::insert_body(const std::shared_ptr<body>& body_ptr)
 {
 	if (is_leaf())
@@ -108,38 +152,31 @@ void adaptive::quadtree::compute_center_of_mass()
 		[&](tree_node* node)
 		{
 			// sum the masses
-			double sum = 0.0;
+			double mass_sum = 0.0;
+			std::complex<double> weighted_pos_sum{ 0, 0 };
 			if (node->is_leaf())
 			{
 				if (node->content != nullptr)
 				{
-					sum = node->content->mass;
+					mass_sum = node->content->mass;
+					weighted_pos_sum = node->content->pos * node->content->mass;
 				}
 			}
 			else
 			{
 				for (const tree_node* child : node->children.value())
 				{
-					sum += child->node_mass;
+					mass_sum += child->node_mass;
+					weighted_pos_sum += child->weighted_pos;
 				}
 			}
 
-			node->node_mass = sum;
+			node->node_mass = mass_sum;
+			node->weighted_pos = weighted_pos_sum;
 		});
 }
 
-std::complex<double> adaptive::quadtree::get_gravity_at(const vec2& pos)
+std::complex<double> adaptive::quadtree::compute_force_at(const vec2& pos)
 {
-	auto current = &root_;
-
-	while (current->is_empty())
-	{
-		if (!current->is_leaf())
-		{
-			const auto quadrant = static_cast<size_t>(current->determine_quadrant(pos));
-			current = current->children->at(quadrant);
-		}
-	}
-
-	return 0.0;
+	return root_.get_gravity_at(pos);
 }
