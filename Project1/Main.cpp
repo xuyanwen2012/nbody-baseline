@@ -20,7 +20,7 @@ int main()
 	constexpr size_t num_bodies = 1024;
 
 	// The main particle table
-	std::array<std::shared_ptr<body>, num_bodies> bodies;
+	std::vector<std::shared_ptr<body>> bodies;
 
 	std::array<vec2, num_bodies> forces_n_squared;
 	std::array<vec2, num_bodies> forces_n_log_n;
@@ -28,16 +28,16 @@ int main()
 	// Initialization of positions/masses
 	for (size_t i = 0; i < num_bodies; ++i)
 	{
-		const auto& pos = vec2{ my_rand(), my_rand() };
+		const auto& pos = vec2{my_rand(), my_rand()};
 		const auto& mass = my_rand() * 1.5;
 
-		bodies[i] = (std::make_shared<body>(i, pos, mass));
+		bodies.push_back(std::make_shared<body>(i, pos, mass));
 	}
 
 	// -------- Do the N squared --------
 	for (size_t i = 0; i < num_bodies; ++i)
 	{
-		forces_n_squared[i] = { 0, 0 };
+		forces_n_squared[i] = {0, 0};
 		for (size_t j = 0; j < num_bodies; ++j)
 		{
 			if (i == j)
@@ -76,14 +76,14 @@ int main()
 
 	// -------- Do Analysis --------
 
-
 	vec2 tmp;
 	for (size_t i = 0; i < num_bodies; ++i)
 	{
 		tmp += pow(forces_n_squared[i] - forces_n_log_n[i], 2);
 	}
 
-	const auto rsme = sqrt(tmp / static_cast<double>(num_bodies));
+	constexpr auto n = static_cast<double>(num_bodies);
+	const auto rsme = sqrt(tmp / n);
 	std::cout << "RSME = " << rsme << std::endl;
 
 	return EXIT_SUCCESS;

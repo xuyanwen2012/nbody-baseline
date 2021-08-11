@@ -6,7 +6,8 @@ using vec2 = std::complex<double>;
 
 struct body
 {
-	body(const int uid, const vec2 pos, const double mass) : uid(uid), pos(pos), mass(mass)
+	body(const int uid, const vec2 pos, const double mass)
+		: uid(uid), pos(pos), mass(mass)
 	{
 	}
 
@@ -15,4 +16,4 @@ struct body
 	double mass;
 };
 
-vec2 kernel_func(const vec2& i, const vec2& j);
+inline vec2 kernel_func(const vec2& i, const vec2& j) { return log(abs(i - j)); }

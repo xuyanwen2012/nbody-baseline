@@ -106,18 +106,18 @@ void adaptive::tree_node::split()
 
 	const auto my_uid = uid * 10;
 
-	const auto sw = new tree_node{ my_uid + 0, rect{cx - hw / 2.0, cy - hh / 2.0, hw, hh}, next_level };
-	const auto se = new tree_node{ my_uid + 1, rect{cx + hw / 2.0, cy - hh / 2.0, hw, hh}, next_level };
-	const auto nw = new tree_node{ my_uid + 2, rect{cx - hw / 2.0, cy + hh / 2.0, hw, hh}, next_level };
-	const auto ne = new tree_node{ my_uid + 3, rect{cx + hw / 2.0, cy + hh / 2.0, hw, hh}, next_level };
+	const auto sw = new tree_node{my_uid + 0, rect{cx - hw / 2.0, cy - hh / 2.0, hw, hh}, next_level};
+	const auto se = new tree_node{my_uid + 1, rect{cx + hw / 2.0, cy - hh / 2.0, hw, hh}, next_level};
+	const auto nw = new tree_node{my_uid + 2, rect{cx - hw / 2.0, cy + hh / 2.0, hw, hh}, next_level};
+	const auto ne = new tree_node{my_uid + 3, rect{cx + hw / 2.0, cy + hh / 2.0, hw, hh}, next_level};
 
-	children = std::optional<std::array<tree_node*, 4>>{ {sw, se, nw, ne} };
+	children = std::optional<std::array<tree_node*, 4>>{{sw, se, nw, ne}};
 }
 
 adaptive::quadtree::quadtree()
 {
 	num_particles_ = 0;
-	root_ = tree_node(1, rect{ 0.5, 0.5, 1.0, 1.0 }, 0);
+	root_ = tree_node(1, rect{0.5, 0.5, 1.0, 1.0}, 0);
 }
 
 void adaptive::quadtree::allocate_node_for_particle(const std::shared_ptr<body>& body_ptr)
@@ -149,31 +149,31 @@ void adaptive::quadtree::compute_center_of_mass()
 	}
 
 	std::for_each(list.rbegin(), list.rend(),
-		[&](tree_node* node)
-		{
-			// sum the masses
-			double mass_sum = 0.0;
-			std::complex<double> weighted_pos_sum{ 0, 0 };
-			if (node->is_leaf())
-			{
-				if (node->content != nullptr)
-				{
-					mass_sum = node->content->mass;
-					weighted_pos_sum = node->content->pos * node->content->mass;
-				}
-			}
-			else
-			{
-				for (const tree_node* child : node->children.value())
-				{
-					mass_sum += child->node_mass;
-					weighted_pos_sum += child->weighted_pos;
-				}
-			}
+	              [&](tree_node* node)
+	              {
+		              // sum the masses
+		              double mass_sum = 0.0;
+		              std::complex<double> weighted_pos_sum{0, 0};
+		              if (node->is_leaf())
+		              {
+			              if (node->content != nullptr)
+			              {
+				              mass_sum = node->content->mass;
+				              weighted_pos_sum = node->content->pos * node->content->mass;
+			              }
+		              }
+		              else
+		              {
+			              for (const tree_node* child : node->children.value())
+			              {
+				              mass_sum += child->node_mass;
+				              weighted_pos_sum += child->weighted_pos;
+			              }
+		              }
 
-			node->node_mass = mass_sum;
-			node->weighted_pos = weighted_pos_sum;
-		});
+		              node->node_mass = mass_sum;
+		              node->weighted_pos = weighted_pos_sum;
+	              });
 }
 
 std::complex<double> adaptive::quadtree::compute_force_at(const vec2& pos)
