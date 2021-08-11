@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <list>
+#include <numeric>
 #include <queue>
 
 void adaptive::tree_node::insert_body(const std::shared_ptr<body>& body_ptr)
@@ -28,7 +29,7 @@ void adaptive::tree_node::insert_body(const std::shared_ptr<body>& body_ptr)
 	children->at(new_quadrant)->insert_body(body_ptr);
 }
 
-adaptive::direction adaptive::tree_node::determine_quadrant(const std::shared_ptr<body>& body) const
+adaptive::tree_node::direction adaptive::tree_node::determine_quadrant(const std::shared_ptr<body>& body) const
 {
 	const auto cx = bounding_box.center.real();
 	const auto cy = bounding_box.center.imag();
@@ -83,66 +84,48 @@ void adaptive::quadtree::allocate_node_for_particle(const std::shared_ptr<body>&
 
 void adaptive::quadtree::compute_center_of_mass()
 {
-	std::vector<tree_node*> queue;
+	std::queue<tree_node*> queue;
+	std::vector<tree_node*> list;
 
-	auto current = &root_;
-	while (!current->is_leaf())
+	queue.push(&root_);
+	while (!queue.empty())
 	{
-		for (auto child : current->children.value())
+		const auto cur = queue.front();
+		queue.pop();
+
+		if (!cur->is_leaf())
 		{
-			queue.push_back(child);
+			for (auto child : cur->children.value())
+			{
+				queue.push(child);
+			}
 		}
+
+		list.push_back(cur);
 	}
 
-	//std::queue<tree_node*> queue;
-	//std::vector<tree_node*> list;
+	std::for_each(list.rbegin(), list.rend(),
+		[&](tree_node* node)
+		{
+			// sum the masses
+			double sum = 0.0;
+			if (node->is_leaf())
+			{
+				if (node->content != nullptr)
+				{
+					sum = node->content->mass;
+				}
+			}
+			else
+			{
+				for (const tree_node* child : node->children.value())
+				{
+					sum += child->node_mass;
+				}
+			}
 
-	//queue.push(&root_);
-	//while (!queue.empty())
-	//{
-	//	const auto cur = queue.front();
-	//	queue.pop();
-
-	//	if (!cur->is_leaf())
-	//	{
-	//		for (auto child : cur->children.value())
-	//		{
-	//			queue.push(child);
-	//		}
-	//	}
-
-	//	list.push_back(cur);
-	//}
-
-	//std::for_each(list.rbegin(), list.rend(),
-	//	[&](tree_node* node)
-	//	{
-	//		// sum the masses
-	//		double sum = 0.0;
-	//		if (node->is_leaf())
-	//		{
-	//			if (node->content != nullptr)
-	//			{
-	//				sum = node->content->mass;
-	//			}
-	//		}
-	//		else
-	//		{
-	//			for (const tree_node* child : node->children.value())
-	//			{
-	//				sum += child->node_mass;
-	//			}
-	//		}
-
-	//		node->node_mass = sum;
-
-	//		std::cout << node->uid;
-	//		if (node->content != nullptr)
-	//		{
-	//			std::cout << " - " << node->content->uid;
-	//		}
-	//		std::cout << std::endl;
-	//	});
+			node->node_mass = sum;
+		});
 }
 
 std::complex<double> adaptive::quadtree::get_gravity_at(const vec2& pos)

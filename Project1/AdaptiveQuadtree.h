@@ -10,10 +10,12 @@
 
 namespace adaptive
 {
-	enum class direction { sw = 0, se, nw, ne };
-
+	/// <summary>
+	/// A node in the quadtree.
+	/// </summary>
 	struct tree_node
 	{
+		enum class direction { sw = 0, se, nw, ne };
 		friend class quadtree;
 
 		tree_node() : uid(-1), level(0), node_mass(0)
