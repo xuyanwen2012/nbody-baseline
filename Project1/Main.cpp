@@ -17,7 +17,7 @@ double my_rand()
 
 int main()
 {
-	constexpr size_t num_bodies = 50;
+	constexpr size_t num_bodies = 1024;
 
 	// The main particle table
 	std::array<std::shared_ptr<body>, num_bodies> bodies;
@@ -75,6 +75,16 @@ int main()
 	}
 
 	// -------- Do Analysis --------
+
+
+	vec2 tmp;
+	for (size_t i = 0; i < num_bodies; ++i)
+	{
+		tmp += pow(forces_n_squared[i] - forces_n_log_n[i], 2);
+	}
+
+	const auto rsme = sqrt(tmp / static_cast<double>(num_bodies));
+	std::cout << "RSME = " << rsme << std::endl;
 
 	return EXIT_SUCCESS;
 }
