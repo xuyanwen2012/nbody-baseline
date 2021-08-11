@@ -44,7 +44,15 @@ int main()
 			{
 				continue;
 			}
-			forces_n_squared[i] += bodies[j]->mass * kernel_func(bodies[i]->pos, bodies[j]->pos);
+
+			const auto force = kernel_func(
+				bodies[i]->pos,
+				bodies[j]->pos
+			);
+
+			const auto fm = bodies[j]->mass * force;
+
+			forces_n_squared[i] += fm;
 		}
 	}
 

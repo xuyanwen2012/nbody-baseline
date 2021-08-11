@@ -130,4 +130,5 @@ void adaptive::quadtree::compute_center_of_mass()
 
 std::complex<double> adaptive::quadtree::get_gravity_at(const vec2& pos)
 {
+	return 0.0;
 }
