@@ -49,9 +49,15 @@ namespace adaptive
 		std::optional<std::array<tree_node*, 4>> children;
 
 		/// <summary>
-		///
+		/// This field stores the total mass of this node and its descendants
 		/// </summary>
 		double node_mass;
+
+		/// <summary>
+		///	The total sum of this node's and its descendants 'Position * mass'
+		/// This is used to compute the center of mass, use it divide by 'node_mass'
+		/// </summary>
+		std::complex<double> weighted_pos;
 
 		/// <summary>
 		///
@@ -63,18 +69,17 @@ namespace adaptive
 		/// </summary>
 		bool is_empty() const { return content == nullptr; }
 
-	private:
+		/// <summary>
+		///
+		/// </summary>
+		direction determine_quadrant(const vec2& pos) const;
 
+	private:
 		/// <summary>
 		///
 		/// </summary>
 		///	<param name="body_ptr"> The body to be inserted into the quadtree. </param>
 		void insert_body(const std::shared_ptr<body>& body_ptr);
-
-		/// <summary>
-		///
-		/// </summary>
-		direction determine_quadrant(const std::shared_ptr<body>& body) const;
 
 		/// <summary>
 		///

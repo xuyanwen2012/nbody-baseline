@@ -19,22 +19,22 @@ void adaptive::tree_node::insert_body(const std::shared_ptr<body>& body_ptr)
 		// then re-insert the current content to the deeper levels
 		split();
 
-		const auto quadrant = static_cast<size_t>(determine_quadrant(content));
+		const auto quadrant = static_cast<size_t>(determine_quadrant(content->pos));
 		children->at(quadrant)->insert_body(content);
 
 		content.reset();
 	}
 
-	const auto new_quadrant = static_cast<size_t>(determine_quadrant(body_ptr));
+	const auto new_quadrant = static_cast<size_t>(determine_quadrant(body_ptr->pos));
 	children->at(new_quadrant)->insert_body(body_ptr);
 }
 
-adaptive::tree_node::direction adaptive::tree_node::determine_quadrant(const std::shared_ptr<body>& body) const
+adaptive::tree_node::direction adaptive::tree_node::determine_quadrant(const vec2& pos) const
 {
 	const auto cx = bounding_box.center.real();
 	const auto cy = bounding_box.center.imag();
-	const auto x = body->pos.real();
-	const auto y = body->pos.imag();
+	const auto x = pos.real();
+	const auto y = pos.imag();
 
 	if (x < cx)
 	{
@@ -130,5 +130,16 @@ void adaptive::quadtree::compute_center_of_mass()
 
 std::complex<double> adaptive::quadtree::get_gravity_at(const vec2& pos)
 {
+	auto current = &root_;
+
+	while (current->is_empty())
+	{
+		if (!current->is_leaf())
+		{
+			const auto quadrant = static_cast<size_t>(current->determine_quadrant(pos));
+			current = current->children->at(quadrant);
+		}
+	}
+
 	return 0.0;
 }
