@@ -1,4 +1,6 @@
 #pragma once
+
+#include <array>
 #include <array>
 #include <complex>
 #include <optional>
@@ -31,7 +33,7 @@ namespace adaptive
 		rect<double> bounding_box;
 
 		/// <summary>
-		/// The stored pointer to the body in memory.
+		///
 		/// </summary>
 		std::shared_ptr<body> content;
 
@@ -42,9 +44,20 @@ namespace adaptive
 		/// </summary>
 		std::optional<std::array<tree_node*, 4>> children;
 
+		/// <summary>
+		///
+		/// </summary>
 		double node_mass;
 
+		/// <summary>
+		///
+		/// </summary>
 		bool is_leaf() const { return !children.has_value(); }
+
+		/// <summary>
+		///
+		/// </summary>
+		bool is_empty() const { return content == nullptr; }
 
 		void insert_body(const std::shared_ptr<body>& body_ptr);
 
@@ -59,6 +72,7 @@ namespace adaptive
 		quadtree();
 		void allocate_node_for_particle(const std::shared_ptr<body>& body_ptr);
 		void compute_center_of_mass();
+		std::complex<double> get_gravity_at(const vec2& pos);
 
 	private:
 		tree_node root_;

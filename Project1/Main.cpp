@@ -61,12 +61,9 @@ int main()
 	qt.compute_center_of_mass();
 
 	// 3) Estimate N-Body Forces
-	for (const auto& a_body : bodies)
+	for (int i = 0; i < num_bodies; ++i)
 	{
-		for (const auto& b_body : bodies)
-		{
-			//qt.get_gravity_at(body_ptr);
-		}
+		forces_n_log_n[i] = qt.get_gravity_at(bodies[i]->pos);
 	}
 
 	return EXIT_SUCCESS;

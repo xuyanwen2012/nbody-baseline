@@ -8,15 +8,16 @@ void adaptive::tree_node::insert_body(const std::shared_ptr<body>& body_ptr)
 {
 	if (is_leaf())
 	{
-		if (content == nullptr)
+		if (is_empty())
 		{
 			content = body_ptr;
 			return;
 		}
 
-		// more than 1 particle are allocated into this node, need to split,
+		// more than 1 particles are allocated into this node, need to split,
 		// then re-insert the current content to the deeper levels
 		split();
+
 		const auto quadrant = static_cast<size_t>(determine_quadrant(content));
 		children->at(quadrant)->insert_body(content);
 
@@ -124,11 +125,15 @@ void adaptive::quadtree::compute_center_of_mass()
 
 			node->node_mass = sum;
 
-			//std::cout << node->uid;
-			//if (node->content != nullptr)
-			//{
-			//	std::cout << " - " << node->content->uid;
-			//}
-			//std::cout << std::endl;
+			std::cout << node->uid;
+			if (node->content != nullptr)
+			{
+				std::cout << " - " << node->content->uid;
+			}
+			std::cout << std::endl;
 		});
+}
+
+std::complex<double> adaptive::quadtree::get_gravity_at(const vec2& pos)
+{
 }
