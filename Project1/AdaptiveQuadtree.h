@@ -14,6 +14,8 @@ namespace adaptive
 
 	struct tree_node
 	{
+		friend class quadtree;
+
 		tree_node() : uid(-1), level(0), node_mass(0)
 		{
 		}
@@ -59,10 +61,22 @@ namespace adaptive
 		/// </summary>
 		bool is_empty() const { return content == nullptr; }
 
+	private:
+
+		/// <summary>
+		///
+		/// </summary>
+		///	<param name="body_ptr"> The body to be inserted into the quadtree. </param>
 		void insert_body(const std::shared_ptr<body>& body_ptr);
 
-	private:
+		/// <summary>
+		///
+		/// </summary>
 		direction determine_quadrant(const std::shared_ptr<body>& body) const;
+
+		/// <summary>
+		///
+		/// </summary>
 		void split();
 	};
 

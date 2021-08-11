@@ -83,55 +83,66 @@ void adaptive::quadtree::allocate_node_for_particle(const std::shared_ptr<body>&
 
 void adaptive::quadtree::compute_center_of_mass()
 {
-	std::queue<tree_node*> queue;
-	std::vector<tree_node*> list;
+	std::vector<tree_node*> queue;
 
-	queue.push(&root_);
-	while (!queue.empty())
+	auto current = &root_;
+	while (!current->is_leaf())
 	{
-		const auto cur = queue.front();
-		queue.pop();
-
-		if (!cur->is_leaf())
+		for (auto child : current->children.value())
 		{
-			for (auto child : cur->children.value())
-			{
-				queue.push(child);
-			}
+			queue.push_back(child);
 		}
-
-		list.push_back(cur);
 	}
 
-	std::for_each(list.rbegin(), list.rend(),
-		[&](tree_node* node)
-		{
-			// sum the masses
-			double sum = 0.0;
-			if (node->is_leaf())
-			{
-				if (node->content != nullptr)
-				{
-					sum = node->content->mass;
-				}
-			}
-			else
-			{
-				for (const tree_node* child : node->children.value())
-				{
-					sum += child->node_mass;
-				}
-			}
+	//std::queue<tree_node*> queue;
+	//std::vector<tree_node*> list;
 
-			node->node_mass = sum;
+	//queue.push(&root_);
+	//while (!queue.empty())
+	//{
+	//	const auto cur = queue.front();
+	//	queue.pop();
 
-			std::cout << node->uid;
-			if (node->content != nullptr)
-			{
-				std::cout << " - " << node->content->uid;
-			}
-			std::cout << std::endl;
-		});
+	//	if (!cur->is_leaf())
+	//	{
+	//		for (auto child : cur->children.value())
+	//		{
+	//			queue.push(child);
+	//		}
+	//	}
+
+	//	list.push_back(cur);
+	//}
+
+	//std::for_each(list.rbegin(), list.rend(),
+	//	[&](tree_node* node)
+	//	{
+	//		// sum the masses
+	//		double sum = 0.0;
+	//		if (node->is_leaf())
+	//		{
+	//			if (node->content != nullptr)
+	//			{
+	//				sum = node->content->mass;
+	//			}
+	//		}
+	//		else
+	//		{
+	//			for (const tree_node* child : node->children.value())
+	//			{
+	//				sum += child->node_mass;
+	//			}
+	//		}
+
+	//		node->node_mass = sum;
+
+	//		std::cout << node->uid;
+	//		if (node->content != nullptr)
+	//		{
+	//			std::cout << " - " << node->content->uid;
+	//		}
+	//		std::cout << std::endl;
+	//	});
 }
 
 std::complex<double> adaptive::quadtree::get_gravity_at(const vec2& pos)
