@@ -17,10 +17,10 @@ double my_rand()
 
 int main()
 {
-	constexpr size_t num_bodies = 10;
+	constexpr size_t num_bodies = 50;
 
 	// The main particle table
-	std::vector<std::shared_ptr<body>> bodies;
+	std::array<std::shared_ptr<body>, num_bodies> bodies;
 
 	std::array<vec2, num_bodies> forces_n_squared;
 	std::array<vec2, num_bodies> forces_n_log_n;
@@ -31,7 +31,7 @@ int main()
 		const auto& pos = vec2{ my_rand(), my_rand() };
 		const auto& mass = my_rand() * 1.5;
 
-		bodies.push_back(std::make_shared<body>(i, pos, mass));
+		bodies[i] = (std::make_shared<body>(i, pos, mass));
 	}
 
 	// -------- Do the N squared --------
@@ -61,6 +61,13 @@ int main()
 	qt.compute_center_of_mass();
 
 	// 3) Estimate N-Body Forces
+	for (const auto& a_body : bodies)
+	{
+		for (const auto& b_body : bodies)
+		{
+			//qt.get_gravity_at(body_ptr);
+		}
+	}
 
 	return EXIT_SUCCESS;
 }

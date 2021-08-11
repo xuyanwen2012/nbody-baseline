@@ -124,11 +124,11 @@ void adaptive::quadtree::compute_center_of_mass()
 
 			node->node_mass = sum;
 
-			std::cout << node->uid;
-			if (node->content != nullptr)
-			{
-				std::cout << " - " << node->content->uid;
-			}
-			std::cout << std::endl;
+			//std::cout << node->uid;
+			//if (node->content != nullptr)
+			//{
+			//	std::cout << " - " << node->content->uid;
+			//}
+			//std::cout << std::endl;
 		});
 }

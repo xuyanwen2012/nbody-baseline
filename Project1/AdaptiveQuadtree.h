@@ -44,12 +44,12 @@ namespace adaptive
 
 		double node_mass;
 
-		[[nodiscard]] bool is_leaf() const { return !children.has_value(); }
+		bool is_leaf() const { return !children.has_value(); }
 
 		void insert_body(const std::shared_ptr<body>& body_ptr);
 
 	private:
-		[[nodiscard]] direction determine_quadrant(const std::shared_ptr<body>& body) const;
+		direction determine_quadrant(const std::shared_ptr<body>& body) const;
 		void split();
 	};
 
